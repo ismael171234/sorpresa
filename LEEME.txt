@@ -1,0 +1,7 @@
+COMO USARLO
+1. Abre index.html con doble clic (o con Live Server en VS Code).
+2. Reemplaza las fotos de la carpeta img/ por las tuyas, conservando el mismo nombre
+   (triste1.jpg a triste5.jpg y feliz1.jpg a feliz3.jpg). Pueden ser mas o menos:
+   edita las listas imagenesTristes e imagenesFelices en el script de index.html.
+3. En el bloque CONFIG de index.html cambia su nombre, tu firma y el mensaje final.
+4. Para enviarsela: sube la carpeta a Netlify Drop (app.netlify.com/drop) y comparte el link.

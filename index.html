@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Una pregunta para ti loquita</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rosa: #ff4d88;
+    --rosa-oscuro: #c2185b;
+    --fondo1: #2b0a3d;
+    --fondo2: #7a1c5a;
+    --fondo3: #ff6f91;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(160deg, var(--fondo1), var(--fondo2) 55%, var(--fondo3));
+    color: #fff;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Corazones flotando de fondo */
+  #fondo-corazones { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .flota {
+    position: absolute;
+    bottom: -40px;
+    opacity: .0;
+    animation: subir linear forwards;
+  }
+  @keyframes subir {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: .7; }
+    100% { transform: translateY(-110vh) rotate(40deg); opacity: 0; }
+  }
+
+  main { position: relative; z-index: 2; width: 100%; max-width: 640px; padding: 20px; }
+
+  h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.4rem, 8vw, 4.2rem);
+    line-height: 1.1;
+    text-shadow: 0 4px 20px rgba(0,0,0,.35);
+    animation: latido 1.8s ease-in-out infinite;
+  }
+  @keyframes latido {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.04); }
+  }
+  .sub { margin-top: 10px; opacity: .9; font-size: 1rem; min-height: 1.5em; }
+
+  /* Marco de imagen */
+  .marco {
+    margin: 22px auto 10px;
+    width: min(300px, 70vw);
+    height: min(300px, 70vw);
+    border-radius: 24px;
+    border: 4px solid rgba(255,255,255,.85);
+    background: rgba(255,255,255,.12);
+    box-shadow: 0 12px 40px rgba(0,0,0,.4);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem;
+    backdrop-filter: blur(6px);
+  }
+  .marco img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .marco.pop { animation: pop .45s ease; }
+  @keyframes pop {
+    0%   { transform: scale(.7) rotate(-6deg); }
+    60%  { transform: scale(1.08) rotate(3deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  .mensaje { min-height: 3.2em; font-size: 1.05rem; margin: 8px auto 16px; max-width: 460px; }
+
+  .botones {
+    display: flex; gap: 18px; justify-content: center; align-items: center;
+    flex-wrap: wrap;
+    min-height: 90px;
+  }
+  button {
+    font-family: inherit;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 26px;
+    cursor: pointer;
+    color: #fff;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  #btn-si {
+    background: linear-gradient(135deg, #ff4d88, #ff1f6b);
+    font-size: 1.1rem;
+    box-shadow: 0 8px 24px rgba(255, 31, 107, .55);
+  }
+  #btn-si:hover { transform: scale(1.06); }
+  #btn-no {
+    background: #3a3a4a;
+    font-size: 1rem;
+    z-index: 50;
+    box-shadow: 0 6px 16px rgba(0,0,0,.4);
+    transition: left .25s ease, top .25s ease;
+  }
+  .hueco-no { display: inline-block; }
+
+  /* Pantalla final */
+  #final { display: none; }
+  #final h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.2rem, 7vw, 3.6rem);
+    text-shadow: 0 4px 20px rgba(0,0,0,.35);
+  }
+  #final .carta {
+    margin: 18px auto 0;
+    max-width: 480px;
+    padding: 18px 20px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 18px;
+    backdrop-filter: blur(6px);
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+  #final .firma { font-family: 'Dancing Script', cursive; font-size: 1.8rem; margin-top: 10px; }
+  .chiste { margin-top: 12px; font-size: .85rem; opacity: .8; }
+
+  /* Corazones de celebración */
+  .lluvia {
+    position: fixed; top: -50px; z-index: 100; pointer-events: none;
+    animation: caer linear forwards;
+  }
+  @keyframes caer {
+    to { transform: translateY(115vh) rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<div id="fondo-corazones"></div>
+
+<main>
+  <!-- PANTALLA DE LA PREGUNTA -->
+  <section id="pregunta">
+    <h1>¿Te casarías conmigo?</h1>
+    <p class="sub" id="sub">Piénsalo bien... </p>
+
+    <div class="marco" id="marco-pregunta">💍</div>
+    <p class="mensaje" id="mensaje"></p>
+
+    <div class="botones">
+      <button id="btn-si">Sí malditoooo jaja💖</button>
+      <span class="hueco-no" id="hueco-no">
+        <button id="btn-no">No idiota</button>
+      </span>
+    </div>
+  </section>
+
+  <!-- PANTALLA FINAL -->
+  <section id="final">
+    <h2 id="titulo-final">¡Dijiste que sí! 🎉</h2>
+    <div class="marco" id="marco-final">🥰</div>
+    <div class="carta">
+      <p id="texto-final"></p>
+      <p class="firma" id="firma"></p>
+    </div>
+    <p class="chiste" id="chiste"></p>
+  </section>
+</main>
+
+<script>
+/* =========================================================
+   ✏️  PERSONALIZA AQUÍ
+   ========================================================= */
+const CONFIG = {
+  // Su nombre (déjalo vacío "" si no quieres que aparezca)
+  nombreElla: "",
+  // Tu nombre para la firma
+  nombreTu: "Ismael",
+
+  // Imagen inicial (la que se ve al abrir la web)
+  imagenInicio: "img/perritopensando.jpg",
+
+  // Imágenes tristes (cuando intenta decir que NO).
+  // Pon tus fotos en una carpeta "img" junto a este archivo.
+  imagenesTristes: [
+    "img/triste1.jpg",
+    "img/triste2.jpg",
+    "img/triste3.jpg",
+    "img/triste4.jpg",
+    "img/triste5.jpg"
+  ],
+
+  // Imágenes felices (cuando dice que SÍ).
+  imagenesFelices: [
+    "img/feliz1.jpg",
+    "img/feliz2.jpg",
+    "img/feliz3.jpg"
+  ],
+
+  // Mensaje romántico final
+  mensajeFinal:
+    "Gracias por aceptarme, bonita. Así que tú y yo tenemos un vínculo jadjkadjajk. " +
+    "Prometo cuidarte, hacerte reír y elegirte todos los días. " +
+    "Contigo hasta lo más simple se siente especial, y quiero vivir muchas historias más a tu lado. 💖"
+};
+
+/* Frases que aparecen cuando intenta darle al NO */
+const frasesTristes = [
+  "Ay no... ese botón no funciona 🥺",
+  "¿Segura? Mira lo triste que me pongo... 😢",
+  "El botón del no está roto, qué mala suerte 💔",
+  "Mi corazoncito se rompió un poquito 🥹",
+  "Inténtalo de nuevo... pero la respuesta es otra 😏",
+  "Hasta el botón se asustó y huyó 🏃‍♂️💨",
+  "No me hagas llorar, por favor 😭",
+  "Ese no era el botón correcto, el rosado es más bonito 💖",
+  "Dale al grande, el que brilla"
+];
+
+/* Frases bajo el título que van cambiando */
+const subtitulos = [
+  "Piénsalo bien... 💭",
+  "Mira que te estoy esperando 👀",
+  "Pista: el botón rosado es el correcto 😉",
+  "Yo sé que quieres decir que sí 💘",
+  "Última oportunidad (mentira, no hay más opciones) 😂"
+];
+
+/* =========================================================
+   LÓGICA
+   ========================================================= */
+const btnNo = document.getElementById("btn-no");
+const btnSi = document.getElementById("btn-si");
+const huecoNo = document.getElementById("hueco-no");
+const marcoPregunta = document.getElementById("marco-pregunta");
+const mensaje = document.getElementById("mensaje");
+const sub = document.getElementById("sub");
+const preguntaSec = document.getElementById("pregunta");
+const finalSec = document.getElementById("final");
+
+let intentos = 0;
+let ultimaTriste = -1;
+let ultimaFrase = -1;
+
+/* Elige un índice aleatorio distinto al anterior */
+function aleatorioDistinto(longitud, anterior) {
+  if (longitud <= 1) return 0;
+  let n;
+  do { n = Math.floor(Math.random() * longitud); } while (n === anterior);
+  return n;
+}
+
+/* Pone una imagen en un marco; si no carga, muestra un emoji */
+function ponerImagen(marco, ruta, emojiRespaldo) {
+  marco.classList.remove("pop");
+  void marco.offsetWidth; // reinicia la animación
+  marco.classList.add("pop");
+  const img = new Image();
+  img.onload = () => { marco.innerHTML = ""; marco.appendChild(img); };
+  img.onerror = () => { marco.textContent = emojiRespaldo; };
+  img.alt = "";
+  img.src = ruta;
+}
+
+/* Mueve el botón NO a un lugar aleatorio de la pantalla */
+function huirNo() {
+  // Reserva el espacio original para que el diseño no se mueva
+  if (btnNo.style.position !== "fixed") {
+    const r = btnNo.getBoundingClientRect();
+    huecoNo.style.width = r.width + "px";
+    huecoNo.style.height = r.height + "px";
+    btnNo.style.position = "fixed";
+  }
+  const w = btnNo.offsetWidth;
+  const h = btnNo.offsetHeight;
+  const margen = 12;
+  const maxX = window.innerWidth - w - margen;
+  const maxY = window.innerHeight - h - margen;
+
+  const actual = btnNo.getBoundingClientRect();
+  let x, y, tries = 0;
+  do {
+    x = margen + Math.random() * Math.max(0, maxX - margen);
+    y = margen + Math.random() * Math.max(0, maxY - margen);
+    tries++;
+  } while (tries < 15 && Math.hypot(x - actual.left, y - actual.top) < 150);
+
+  btnNo.style.left = x + "px";
+  btnNo.style.top = y + "px";
+}
+
+/* Reacción cada vez que ella intenta tocar el NO */
+function intentoNo(e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  intentos++;
+
+  // imagen triste
+  const i = aleatorioDistinto(CONFIG.imagenesTristes.length, ultimaTriste);
+  ultimaTriste = i;
+  ponerImagen(marcoPregunta, CONFIG.imagenesTristes[i], "😢");
+
+  // frase triste
+  const f = aleatorioDistinto(frasesTristes.length, ultimaFrase);
+  ultimaFrase = f;
+  mensaje.textContent = frasesTristes[f];
+
+  // subtítulo
+  sub.textContent = subtitulos[Math.min(intentos, subtitulos.length - 1)];
+
+  // el SÍ crece cada vez más
+  const escala = Math.min(1 + intentos * 0.12, 2.2);
+  btnSi.style.transform = "scale(" + escala + ")";
+  btnSi.style.margin = (escala - 1) * 18 + "px";
+
+  huirNo();
+}
+
+// Se escapa con mouse, dedo o teclado
+["mouseenter", "pointerdown", "touchstart", "click", "focus"].forEach(ev =>
+  btnNo.addEventListener(ev, intentoNo, { passive: false })
+);
+window.addEventListener("resize", () => {
+  if (btnNo.style.position === "fixed") huirNo();
+});
+
+/* ---------- Corazones de fondo ---------- */
+const fondo = document.getElementById("fondo-corazones");
+const emojisFondo = ["💖", "💗", "💕", "💘", "💝", "🌹", "✨"];
+function crearFlotante() {
+  const s = document.createElement("span");
+  s.className = "flota";
+  s.textContent = emojisFondo[Math.floor(Math.random() * emojisFondo.length)];
+  s.style.left = Math.random() * 100 + "vw";
+  s.style.fontSize = 14 + Math.random() * 26 + "px";
+  const dur = 6 + Math.random() * 7;
+  s.style.animationDuration = dur + "s";
+  fondo.appendChild(s);
+  setTimeout(() => s.remove(), dur * 1000);
+}
+setInterval(crearFlotante, 450);
+for (let i = 0; i < 10; i++) setTimeout(crearFlotante, i * 150);
+
+/* ---------- Lluvia de corazones al decir SÍ ---------- */
+const emojisLluvia = ["💖", "💗", "💕", "💘", "💝", "❤️", "🌹", "💞", "✨", "🥰"];
+function lluvia() {
+  const s = document.createElement("span");
+  s.className = "lluvia";
+  s.textContent = emojisLluvia[Math.floor(Math.random() * emojisLluvia.length)];
+  s.style.left = Math.random() * 100 + "vw";
+  s.style.fontSize = 18 + Math.random() * 34 + "px";
+  const dur = 3 + Math.random() * 4;
+  s.style.animationDuration = dur + "s";
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), dur * 1000);
+}
+
+/* ---------- Botón SÍ ---------- */
+btnSi.addEventListener("click", () => {
+  preguntaSec.style.display = "none";
+  btnNo.style.display = "none";
+  finalSec.style.display = "block";
+
+  const nombre = CONFIG.nombreElla ? ", " + CONFIG.nombreElla : "";
+  document.getElementById("titulo-final").textContent = "¡Dijiste que sí" + nombre + "! ";
+  document.getElementById("texto-final").textContent = CONFIG.mensajeFinal;
+  document.getElementById("firma").textContent = "— " + CONFIG.nombreTu + " 💌";
+
+  const j = Math.floor(Math.random() * CONFIG.imagenesFelices.length);
+  ponerImagen(document.getElementById("marco-final"), CONFIG.imagenesFelices[j], "🥰");
+
+  document.getElementById("chiste").textContent = intentos > 0
+    ? "Por cierto, intentaste decir que no " + intentos + (intentos === 1 ? " vez" : " veces") + " 😏"
+    : "¡Ni lo intentaste con el no! Eso me encantaaaaaa ";
+
+  // lluvia constante de corazones
+  for (let i = 0; i < 60; i++) setTimeout(lluvia, i * 60);
+  setInterval(lluvia, 180);
+});
+
+/* ---------- Imagen inicial (perrito pensando) ---------- */
+ponerImagen(marcoPregunta, CONFIG.imagenInicio, "💍");
+</script>
+</body>
+</html>
